@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import HTTPException, status
@@ -40,7 +40,8 @@ class RFQService:
             )
         
         # Validate deadline is in the future
-        if rfq_in.deadline <= datetime.utcnow():
+        now = datetime.utcnow()
+        if rfq_in.deadline <= now:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="RFQ deadline must be in the future"
@@ -73,7 +74,26 @@ class RFQService:
             import logging
             logging.getLogger(__name__).warning(f"Failed to trigger AI summarization for RFQ {rfq.id}: {str(e)}")
         
-        return RFQResponse.from_orm(rfq)
+        # Create response dict manually to avoid async property issues
+        rfq_dict = {
+            "id": rfq.id,
+            "title": rfq.title,
+            "description": rfq.description,
+            "deadline": rfq.deadline,
+            "status": rfq.status,
+            "budget_min": rfq.budget_min,
+            "budget_max": rfq.budget_max,
+            "requirements": rfq.requirements,
+            "created_at": rfq.created_at,
+            "updated_at": rfq.updated_at,
+            "buyer_company_id": rfq.buyer_company_id,
+            "created_by_user_id": rfq.created_by_user_id,
+            "buyer_company": rfq.buyer_company,
+            "bid_count": 0,  # New RFQ has no bids
+            "is_open": rfq.status == RFQStatus.OPEN and rfq.deadline > datetime.utcnow(),
+            "is_expired": rfq.deadline <= datetime.utcnow()
+        }
+        return RFQResponse.model_validate(rfq_dict)
     
     async def get_rfq(
         self, db: AsyncSession, *, rfq_id: int, current_user: User
@@ -112,7 +132,7 @@ class RFQService:
                 detail="Not authorized to view this RFQ"
             )
         
-        return RFQResponse.from_orm(rfq)
+        return RFQResponse.model_validate(rfq)
     
     async def get_my_rfqs(
         self, 
@@ -137,7 +157,7 @@ class RFQService:
         rfqs = await self.rfq_repo.get_by_company(
             db, company_id=current_user.company_id, skip=skip, limit=limit
         )
-        return [RFQListResponse.from_orm(rfq) for rfq in rfqs]
+        return [RFQListResponse.model_validate(rfq) for rfq in rfqs]
     
     async def get_open_rfqs(
         self, 
@@ -179,7 +199,7 @@ class RFQService:
             skip=skip, 
             limit=limit
         )
-        return [RFQListResponse.from_orm(rfq) for rfq in rfqs]
+        return [RFQListResponse.model_validate(rfq) for rfq in rfqs]
     
     async def update_rfq(
         self, 
@@ -229,11 +249,12 @@ class RFQService:
             )
         
         # Validate deadline if being updated
-        if rfq_update.deadline and rfq_update.deadline <= datetime.utcnow():
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="RFQ deadline must be in the future"
-            )
+        if rfq_update.deadline:
+            if rfq_update.deadline <= datetime.utcnow():
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="RFQ deadline must be in the future"
+                )
         
         # Update RFQ
         updated_rfq = await self.rfq_repo.update(
@@ -242,7 +263,7 @@ class RFQService:
         
         # Load relationships for response
         updated_rfq = await self.rfq_repo.get_with_details(db, updated_rfq.id)
-        return RFQResponse.from_orm(updated_rfq)
+        return RFQResponse.model_validate(updated_rfq)
     
     async def publish_rfq(
         self, db: AsyncSession, *, rfq_id: int, current_user: User
@@ -296,7 +317,7 @@ class RFQService:
         
         # Load relationships for response
         updated_rfq = await self.rfq_repo.get_with_details(db, updated_rfq.id)
-        return RFQResponse.from_orm(updated_rfq)
+        return RFQResponse.model_validate(updated_rfq)
     
     async def close_rfq(
         self, db: AsyncSession, *, rfq_id: int, current_user: User
@@ -344,7 +365,7 @@ class RFQService:
         
         # Load relationships for response
         updated_rfq = await self.rfq_repo.get_with_details(db, updated_rfq.id)
-        return RFQResponse.from_orm(updated_rfq)
+        return RFQResponse.model_validate(updated_rfq)
 
 
 # Create service instance
