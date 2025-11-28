@@ -217,8 +217,6 @@ class RFQListResponse(BaseModel):
     status: RFQStatus
     created_at: datetime
     buyer_company: CompanyResponse
-    bid_count: int = Field(default=0, description="Number of bids received")
-    is_open: bool = Field(description="Whether RFQ is open for bidding")
 
 
 # Bid schemas
