@@ -21,5 +21,5 @@ USER appuser
 # Expose port
 EXPOSE 8000
 
-# Run migrations and start the application
-CMD ["sh", "-c", "python migrate.py && python start.py"]
+# Start the application
+CMD ["python", "simple_start.py"]
