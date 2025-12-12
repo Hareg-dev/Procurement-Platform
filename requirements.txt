@@ -13,3 +13,7 @@ celery==5.5.3
 websockets==15.0.1
 python-dotenv==1.2.1
 psycopg2-binary==2.9.11
+asyncpg==0.29.0
+alembic==1.14.0
+pydantic-settings==2.8.2
+aiosqlite==0.20.0

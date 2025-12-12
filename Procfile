@@ -1,2 +1,2 @@
-web: uvicorn app.main:app --host 0.0.0.0 --port $PORT
-worker: celery -A app.worker.celery worker --loglevel=info
+web: python migrate.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+release: python migrate.py

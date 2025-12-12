@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     # Database settings
     database_url: str = Field(
         default="sqlite+aiosqlite:///./procurement.db",
-        description="Database URL - SQLite for development",
+        description="Database URL - PostgreSQL for production, SQLite for development",
     )
 
     # JWT settings
