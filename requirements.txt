@@ -1,7 +1,7 @@
 fastapi==0.121.2
 uvicorn==0.38.0
 sqlalchemy==2.0.44
-pydantic-settings>=2.8.0,<3.0.0
+pydantic-settings==2.12.0
 python-jose==3.5.0
 passlib==1.7.4
 bcrypt==5.0.0
@@ -15,5 +15,4 @@ python-dotenv==1.2.1
 psycopg2-binary==2.9.11
 asyncpg==0.29.0
 alembic==1.14.0
-pydantic-settings==2.8.2
 aiosqlite==0.20.0
