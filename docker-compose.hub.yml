@@ -7,6 +7,7 @@ services:
       POSTGRES_DB: procurement
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password123
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
     volumes:
@@ -23,7 +24,8 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
-    command: sh -c "ollama serve & sleep 10 && ollama pull tinyllama && wait"
+    entrypoint: ["/bin/sh", "-c"]
+    command: "ollama serve & sleep 10 && ollama pull tinyllama && wait"
 
   app:
     image: haregdev/procurement-platform:latest
