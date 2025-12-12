@@ -14,12 +14,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Create non-root user
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
-USER appuser
-
 # Expose port
 EXPOSE 8000
 
-# Run migrations and start the application
-CMD ["sh", "-c", "python migrate.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT"]
+# Default command for local development
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
