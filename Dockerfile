@@ -22,4 +22,4 @@ USER appuser
 EXPOSE 8000
 
 # Run migrations and start the application
-CMD ["sh", "-c", "python migrate.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT"]
+CMD ["sh", "-c", "python migrate.py && python start.py"]
