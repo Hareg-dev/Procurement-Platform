@@ -1,2 +1,1 @@
-web: python test_server.py
-release: echo "No migrations needed for test"
+web: python migrate.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT
