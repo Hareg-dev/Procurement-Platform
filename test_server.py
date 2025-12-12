@@ -17,6 +17,13 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 8000))
-    print(f"Starting server on port {port}")
-    server = HTTPServer(('0.0.0.0', port), Handler)
-    server.serve_forever()
+    print(f"PORT env var: {os.getenv('PORT')}")
+    print(f"Starting server on 0.0.0.0:{port}")
+    try:
+        server = HTTPServer(('0.0.0.0', port), Handler)
+        print("Server created successfully")
+        server.serve_forever()
+    except Exception as e:
+        print(f"Server error: {e}")
+        import traceback
+        traceback.print_exc()
