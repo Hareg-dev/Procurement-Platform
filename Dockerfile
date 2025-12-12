@@ -22,4 +22,4 @@ USER appuser
 EXPOSE 8000
 
 # Start the application
-CMD ["python", "simple_start.py"]
+CMD ["python", "test_server.py"]
