@@ -14,8 +14,7 @@ async def lifespan(app: FastAPI):
     
     Handles startup and shutdown events for the FastAPI application.
     """
-    # Startup
-    await init_db()
+    # Startup - skip init_db since migrations handle this
     yield
     # Shutdown
     await close_db()

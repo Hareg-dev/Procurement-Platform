@@ -21,5 +21,5 @@ USER appuser
 # Expose port
 EXPOSE 8000
 
-# Initialize database and run the application
-CMD ["sh", "-c", "python init_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+# Run migrations and start the application
+CMD ["sh", "-c", "python migrate.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT"]
