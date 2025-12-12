@@ -56,11 +56,6 @@ def create_application() -> FastAPI:
             "environment": settings.environment,
         }
 
-    @app.get("/health")
-    async def health_check():
-        """Health check endpoint."""
-        return {"status": "healthy"}
-
     return app
 
 
