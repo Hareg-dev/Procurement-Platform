@@ -1,2 +1,1 @@
-web: python start.py
-release: python migrate.py
+web: python simple_start.py
