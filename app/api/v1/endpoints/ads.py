@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.dependencies import get_current_user, require_admin
@@ -66,7 +66,13 @@ async def approve_advertisement(
     """
     Approve a pending advertisement request.
     """
-    return await ad_service.approve_ad(db, ad_id=ad_id)
+    try:
+        return await ad_service.approve_ad(db, ad_id=ad_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to approve advertisement: {str(e)}"
+        )
 
 
 @router.get("/targeted", response_model=List[AdvertisementResponse])

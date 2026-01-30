@@ -121,7 +121,7 @@ class AdService:
         """
         Approve a pending advertisement.
         """
-        ad = await self.ad_repo.get(db, id=ad_id)
+        ad = await self.ad_repo.get(db, record_id=ad_id)
         if not ad:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

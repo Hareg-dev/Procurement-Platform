@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, users, rfqs, bids, public, chat, ads, dashboard, recommendations
+from app.api.v1.endpoints import auth, users, rfqs, bids, public, chat, ads, dashboard, recommendations, messages
 
 api_router = APIRouter()
 
@@ -30,3 +30,6 @@ api_router.include_router(chat.router, prefix="/chat", tags=["ai-chat"])
 
 # Advertisement routes
 api_router.include_router(ads.router, prefix="/ads", tags=["ads"])
+
+# Direct messaging routes
+api_router.include_router(messages.router, prefix="/messages", tags=["messaging"])
