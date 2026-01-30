@@ -7,7 +7,7 @@ from typing import List, Dict, Any, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, desc
 
-from app.models.orm import User, RFQ, Bid, UserRole, RFQStatus
+from app.models.orm import User, RFQ, Bid, UserRole, RFQStatus, Company
 from app.models.dashboard import NotificationItem
 
 

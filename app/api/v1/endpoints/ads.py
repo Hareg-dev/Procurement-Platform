@@ -29,6 +29,46 @@ async def create_advertisement(
     return await ad_service.create_ad(db, ad_in=ad_in, current_user=current_user)
 
 
+@router.post("/client-request", response_model=dict)
+async def request_advertisement(
+    *,
+    db: AsyncSession = Depends(get_db),
+    ad_in: AdvertisementCreate,
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Submit advertisement request for admin approval.
+    
+    Clients can request ads that admins review and approve.
+    """
+    return await ad_service.request_ad(db, ad_in=ad_in, current_user=current_user)
+
+
+@router.get("/pending", response_model=List[dict])
+async def get_pending_ads(
+    *,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    """
+    Get pending advertisement requests for admin approval.
+    """
+    return await ad_service.get_pending_ads(db)
+
+
+@router.post("/approve/{ad_id}")
+async def approve_advertisement(
+    *,
+    db: AsyncSession = Depends(get_db),
+    ad_id: int,
+    current_user: User = Depends(require_admin),
+):
+    """
+    Approve a pending advertisement request.
+    """
+    return await ad_service.approve_ad(db, ad_id=ad_id)
+
+
 @router.get("/targeted", response_model=List[AdvertisementResponse])
 async def get_targeted_ads(
     *,

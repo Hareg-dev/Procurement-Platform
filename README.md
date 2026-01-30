@@ -2,18 +2,18 @@
 
 A complete B2B procurement marketplace with AI-powered features, real-time capabilities, and role-based user experiences. Built with FastAPI and enhanced with TinyLlama AI integration.
 
-## 🎯 What This System Does
+##  What This System Does
 
 **Core Business Flow:** Buyers create RFQs → AI matches Suppliers → Suppliers submit Bids → Buyers select winners
 
 **Key Features:**
-- 🤖 **AI-Powered Matching**: TinyLlama integration for intelligent supplier-RFQ matching
-- 📊 **Smart Dashboards**: Role-specific interfaces for Buyers, Suppliers, and Admins
-- 🔔 **Real-Time Notifications**: Instant alerts for bids, deadlines, and opportunities
-- 💬 **AI Chat Assistant**: Real-time procurement guidance and negotiation help
-- 📈 **Business Intelligence**: Performance analytics and market insights
+-  **AI-Powered Matching**: TinyLlama integration for intelligent supplier-RFQ matching
+-  **Smart Dashboards**: Role-specific interfaces for Buyers, Suppliers, and Admins
+-  **Real-Time Notifications**: Instant alerts for bids, deadlines, and opportunities
+-  **AI Chat Assistant**: Real-time procurement guidance and negotiation help
+-  **Business Intelligence**: Performance analytics and market insights
 
-## 🏗️ Tech Stack
+##  Tech Stack
 
 - **Framework**: FastAPI (async)
 - **Database**: SQLite/PostgreSQL with SQLAlchemy 2.0
@@ -23,15 +23,15 @@ A complete B2B procurement marketplace with AI-powered features, real-time capab
 - **Background Tasks**: Celery with Redis
 - **API Documentation**: Auto-generated OpenAPI/Swagger
 
-## 👥 How Users Experience the System
+##  How Users Experience the System
 
-### 🏢 **BUYER Experience**
+###  **BUYER Experience**
 **Who:** Procurement managers, purchasing departments
 **What they get when logging in:**
 ```
-Welcome back, Sarah! 🏢 TechCorp Industries
+Welcome back, Sarah!  TechCorp Industries
 
-📊 Dashboard Overview:
+ Dashboard Overview:
 • Active RFQs: 3 (5 bids pending review)
 • This Month: $45K in contracts awarded
 • AI Recommendations: "Consider bulk purchasing for 15% savings"
@@ -39,7 +39,7 @@ Welcome back, Sarah! 🏢 TechCorp Industries
 ⚡ Quick Actions:
 [Create RFQ] [Review Bids] [Analytics] [Find Suppliers]
 
-🎯 Pending Decisions:
+ Pending Decisions:
 • Office Equipment RFQ - 5 bids received (deadline in 2 days)
 • IT Services RFQ - 2 bids received
 ```
@@ -52,13 +52,13 @@ Welcome back, Sarah! 🏢 TechCorp Industries
 5. **Select Winner** → Award contract with one click
 6. **Track Performance** → Monitor supplier delivery and quality
 
-### 🏭 **SUPPLIER Experience**
+###  **SUPPLIER Experience**
 **Who:** Sales teams, business development, service providers
 **What they get when logging in:**
 ```
-Welcome back, Mike! 🏭 SupplyPro Solutions
+Welcome back, Mike!  SupplyPro Solutions
 
-⭐ Performance Score: 4.8/5.0 (Top 10% of suppliers)
+ Performance Score: 4.8/5.0 (Top 10% of suppliers)
 
 🎯 AI-Matched Opportunities:
 • Office Furniture Procurement - $15K-$25K budget
@@ -66,10 +66,10 @@ Welcome back, Mike! 🏭 SupplyPro Solutions
 • Workspace Setup Project - $8K-$12K budget  
   From: StartupHub Inc | Match: 87% | Deadline: Feb 5
 
-📝 My Bids Status:
-🎉 Marketing Materials - $5,500 (WON!)
-⏳ Office Equipment - $22,000 (Under Review)
-⏳ IT Hardware - $15,000 (Submitted)
+ My Bids Status:
+ Marketing Materials - $5,500 (WON!)
+ Office Equipment - $22,000 (Under Review)
+ IT Hardware - $15,000 (Submitted)
 ```
 
 **Supplier Workflow:**
@@ -105,7 +105,7 @@ Welcome back, Mike! 🏭 SupplyPro Solutions
 - **Dispute Resolution** → Handle conflicts between parties
 - **Content Moderation** → Review RFQs and company profiles
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.11+
@@ -249,7 +249,7 @@ curl -X GET "http://localhost:8000/api/v1/dashboard" \
     └── Background Task Processing
 ```
 
-## 🎉 What Makes This Special
+## What Makes This Special
 
 ✅ **Complete B2B Solution**: End-to-end procurement workflow
 ✅ **AI-Enhanced**: TinyLlama integration for smart matching
@@ -274,4 +274,4 @@ This enhanced procurement platform demonstrates modern B2B marketplace capabilit
 
 ---
 
-**Ready to revolutionize B2B procurement with AI-powered intelligence!** 🚀
+**Ready to revolutionize B2B procurement with AI-powered intelligence!** 

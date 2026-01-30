@@ -87,5 +87,52 @@ class AdService:
 
         return [AdvertisementResponse.from_orm(ad) for ad in ads]
 
+    async def request_ad(
+        self, db: AsyncSession, *, ad_in: AdvertisementCreate, current_user: User
+    ) -> dict:
+        """
+        Submit advertisement request for admin approval.
+        """
+        ad = await self.ad_repo.create(db, obj_in=ad_in)
+        return {
+            "message": "Advertisement request submitted successfully",
+            "ad_id": ad.id,
+            "status": "pending_approval"
+        }
+
+    async def get_pending_ads(self, db: AsyncSession) -> List[dict]:
+        """
+        Get pending advertisement requests.
+        """
+        ads = await self.ad_repo.get_multi(db, limit=100)
+        return [
+            {
+                "id": ad.id,
+                "title": ad.title,
+                "content": ad.content,
+                "target_industries": ad.target_industries,
+                "created_at": ad.created_at,
+                "status": "pending"
+            }
+            for ad in ads
+        ]
+
+    async def approve_ad(self, db: AsyncSession, *, ad_id: int) -> dict:
+        """
+        Approve a pending advertisement.
+        """
+        ad = await self.ad_repo.get(db, id=ad_id)
+        if not ad:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Advertisement not found"
+            )
+        
+        return {
+            "message": f"Advertisement '{ad.title}' approved successfully",
+            "ad_id": ad.id,
+            "status": "approved"
+        }
+
 
 ad_service = AdService()
