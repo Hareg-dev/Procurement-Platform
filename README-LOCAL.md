@@ -46,11 +46,11 @@ pip install -r requirements.txt
 copy .env.local .env
 ```
 
-### 4. Run Migrations and Start
+### 4. Start the API
 ```bash
-python migrate.py
 uvicorn app.main:app --reload
 ```
+The schema is created automatically on startup by `app.core.db.init_db()`.
 
 ## Test the System
 

@@ -24,7 +24,7 @@ services:
       - postgres
     volumes:
       - .:/app
-    command: sh -c "python migrate.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    command: sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
 volumes:
   postgres_data:
