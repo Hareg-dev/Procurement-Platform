@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_
 from typing import List
 
 from app.api.v1.dependencies import get_current_user
 from app.core.db import get_db
-from app.models.orm import User, Company
+from app.models.orm import User, Company, UserRole
 
 router = APIRouter()
 
@@ -29,7 +29,11 @@ async def search_users(
     )
     
     if role:
-        query = query.where(User.role == role.upper())
+        try:
+            role_filter = UserRole(role.lower())
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Invalid role: {role}")
+        query = query.where(User.role == role_filter)
     
     result = await db.execute(query.limit(20))
     rows = result.all()
