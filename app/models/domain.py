@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator
 
 from app.models.orm import UserRole, RFQStatus
 
@@ -57,6 +57,14 @@ class UserCreate(UserBase):
         ..., min_length=8, description="User password (min 8 characters)"
     )
     company: CompanyCreate = Field(..., description="Company information")
+
+    @field_validator("role")
+    @classmethod
+    def reject_admin_self_registration(cls, value: UserRole) -> UserRole:
+        """Admin accounts must be provisioned out of band, never via signup."""
+        if value == UserRole.ADMIN:
+            raise ValueError("Admin accounts cannot be self-registered")
+        return value
 
 
 class UserLogin(BaseModel):
