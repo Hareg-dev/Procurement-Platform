@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from typing import Dict, List, Optional
 
 import redis.asyncio as redis
@@ -8,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.dependencies import get_current_active_user
 from app.core.config import settings
-from app.core.db import get_db
+from app.core.db import AsyncSessionLocal
 from app.core.security import decode_token
 from app.models.orm import User
 from app.repositories.rfq_repo import rfq_repository
@@ -167,28 +168,13 @@ async def websocket_chat_endpoint(
     - Real-time responses with WebSocket
     - Proper error handling and connection management
     """
-    import time
-    
     # Accept WebSocket connection
     await websocket.accept()
     
     user = None
-    db = None
+    db = AsyncSessionLocal()
     
     try:
-        # Get database session
-        async for session in get_db():
-            db = session
-            break
-        
-        if not db:
-            await websocket.send_json({
-                "type": "error",
-                "message": "Database connection failed"
-            })
-            await websocket.close()
-            return
-        
         # Authenticate user
         user = await authenticate_websocket_user(token, db)
         if not user:
@@ -316,8 +302,10 @@ async def websocket_chat_endpoint(
     finally:
         try:
             await websocket.close()
-        except:
+        except Exception:
             pass
+        # Release the session held for the lifetime of the socket
+        await db.close()
 
 
 @router.post("/simple-chat", response_model=ChatResponse)

@@ -4,7 +4,7 @@ from typing import Optional
 from celery import current_task
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.db import get_db
+from app.core.db import AsyncSessionLocal, engine
 from app.models.orm import RFQ, Bid
 from app.repositories.rfq_repo import rfq_repository
 from app.repositories.bid_repo import bid_repository
@@ -35,7 +35,7 @@ def summarize_rfq_and_bids(self, rfq_id: int) -> dict:
         """Async function to handle the actual summarization work."""
         try:
             # Get database session
-            async for db in get_db():
+            async with AsyncSessionLocal() as db:
                 # Fetch RFQ with all bids
                 rfq = await rfq_repository.get_with_details(db, rfq_id)
                 if not rfq:
@@ -112,6 +112,10 @@ def summarize_rfq_and_bids(self, rfq_id: int) -> dict:
         except Exception as e:
             logger.error(f"Task failed for RFQ {rfq_id}: {str(e)}")
             return {"error": f"Task failed: {str(e)}"}
+        finally:
+            # Each task runs in a fresh event loop (asyncio.run), so drop
+            # pooled connections bound to the loop that is about to close.
+            await engine.dispose()
     
     # Run the async function
     try:
@@ -152,7 +156,7 @@ def summarize_single_bid(self, bid_id: int) -> dict:
         """Async function to handle bid summarization."""
         try:
             # Get database session
-            async for db in get_db():
+            async with AsyncSessionLocal() as db:
                 # Fetch bid with details
                 bid = await bid_repository.get_with_details(db, bid_id)
                 if not bid:
@@ -199,6 +203,10 @@ def summarize_single_bid(self, bid_id: int) -> dict:
         except Exception as e:
             logger.error(f"Task failed for bid {bid_id}: {str(e)}")
             return {"error": f"Task failed: {str(e)}"}
+        finally:
+            # Each task runs in a fresh event loop (asyncio.run), so drop
+            # pooled connections bound to the loop that is about to close.
+            await engine.dispose()
     
     # Run the async function
     try:
