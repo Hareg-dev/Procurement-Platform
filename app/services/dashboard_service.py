@@ -133,7 +133,7 @@ class DashboardService:
         )
         
         # Total bids received this month
-        month_ago = datetime.now() - timedelta(days=30)
+        month_ago = datetime.utcnow() - timedelta(days=30)
         bids_count = await db.scalar(
             select(func.count(Bid.id))
             .join(RFQ)
@@ -149,7 +149,7 @@ class DashboardService:
             .where(and_(
                 RFQ.buyer_company_id == user.company_id,
                 RFQ.status == RFQStatus.OPEN,
-                RFQ.deadline > datetime.now()
+                RFQ.deadline > datetime.utcnow()
             ))
         )
 
@@ -168,7 +168,7 @@ class DashboardService:
             .where(and_(
                 RFQ.status == RFQStatus.OPEN,
                 RFQ.buyer_company_id != user.company_id,
-                RFQ.deadline > datetime.now()
+                RFQ.deadline > datetime.utcnow()
             ))
         )
         
@@ -228,7 +228,7 @@ class DashboardService:
         rfqs = []
         for rfq, bid_count in result:
             needs_attention = (
-                rfq.deadline < datetime.now() + timedelta(days=3) and 
+                rfq.deadline < datetime.utcnow() + timedelta(days=3) and 
                 rfq.status == RFQStatus.OPEN
             )
             
@@ -252,7 +252,7 @@ class DashboardService:
             .where(and_(
                 RFQ.buyer_company_id == user.company_id,
                 RFQ.status == RFQStatus.OPEN,
-                RFQ.deadline > datetime.now()
+                RFQ.deadline > datetime.utcnow()
             ))
             .group_by(RFQ.id)
             .having(func.count(Bid.id) > 0)
@@ -280,7 +280,7 @@ class DashboardService:
             .where(and_(
                 RFQ.status == RFQStatus.OPEN,
                 RFQ.buyer_company_id != user.company_id,
-                RFQ.deadline > datetime.now()
+                RFQ.deadline > datetime.utcnow()
             ))
             .order_by(desc(RFQ.created_at))
             .limit(8)
@@ -359,13 +359,13 @@ class DashboardService:
             ActivityItem(
                 title="New bid received",
                 description="Office Equipment RFQ received 2 new bids",
-                timestamp=datetime.now() - timedelta(hours=2),
+                timestamp=datetime.utcnow() - timedelta(hours=2),
                 type="bid"
             ),
             ActivityItem(
                 title="RFQ deadline approaching",
                 description="IT Services RFQ deadline in 3 days",
-                timestamp=datetime.now() - timedelta(hours=5),
+                timestamp=datetime.utcnow() - timedelta(hours=5),
                 type="rfq"
             )
         ]
@@ -376,13 +376,13 @@ class DashboardService:
             ActivityItem(
                 title="Bid submitted",
                 description="Submitted bid for Marketing Materials RFQ",
-                timestamp=datetime.now() - timedelta(hours=1),
+                timestamp=datetime.utcnow() - timedelta(hours=1),
                 type="bid"
             ),
             ActivityItem(
                 title="New opportunity",
                 description="Office Supplies RFQ matches your profile",
-                timestamp=datetime.now() - timedelta(hours=3),
+                timestamp=datetime.utcnow() - timedelta(hours=3),
                 type="rfq"
             )
         ]
@@ -393,20 +393,20 @@ class DashboardService:
             ActivityItem(
                 title="New company registered",
                 description="Global Tech Solutions joined the platform",
-                timestamp=datetime.now() - timedelta(minutes=30),
+                timestamp=datetime.utcnow() - timedelta(minutes=30),
                 type="company"
             ),
             ActivityItem(
                 title="High-value contract awarded",
                 description="$50K IT Services contract awarded",
-                timestamp=datetime.now() - timedelta(hours=2),
+                timestamp=datetime.utcnow() - timedelta(hours=2),
                 type="award"
             )
         ]
 
     async def _get_today_activity(self, db: AsyncSession) -> Dict[str, int]:
         """Get today's platform activity"""
-        today = datetime.now().date()
+        today = datetime.utcnow().date()
         
         new_rfqs = await db.scalar(
             select(func.count(RFQ.id))
@@ -440,7 +440,7 @@ class DashboardService:
             ActivityItem(
                 title="User verification pending",
                 description="3 companies awaiting verification",
-                timestamp=datetime.now(),
+                timestamp=datetime.utcnow(),
                 type="verification"
             )
         ]
