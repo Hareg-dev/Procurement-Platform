@@ -22,4 +22,16 @@ celery_app.conf.update(
     task_soft_time_limit=25 * 60,  # 25 minutes
     worker_prefetch_multiplier=1,
     worker_max_tasks_per_child=1000,
+    # Summarisation is best-effort. When Redis is unavailable, .delay() must
+    # fail fast instead of blocking RFQ/bid creation through ~20 reconnects.
+    broker_connection_retry_on_startup=False,
+    task_publish_retry=False,
+    result_backend_transport_options={
+        "retry_policy": {
+            "max_retries": 1,
+            "interval_start": 0,
+            "interval_step": 0.2,
+            "interval_max": 0.5,
+        }
+    },
 )
