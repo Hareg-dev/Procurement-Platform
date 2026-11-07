@@ -114,22 +114,14 @@ class BidService:
         
         return BidResponse.from_orm(bid)
     
-    async def get_bid(
+    async def get_bid_with_details(
         self, db: AsyncSession, *, bid_id: int, current_user: User
-    ) -> BidResponse:
+    ) -> Bid:
         """
-        Get bid by ID with access control.
-        
-        Args:
-            db: Database session
-            bid_id: Bid ID
-            current_user: Current authenticated user
-            
-        Returns:
-            BidResponse: Bid data
-            
-        Raises:
-            HTTPException: If bid not found or access denied
+        Get a bid with its RFQ and supplier relationships, enforcing access.
+
+        Returns the ORM instance (not a response schema) so callers can read
+        relationship data such as the bid's RFQ.
         """
         bid = await self.bid_repo.get_with_details(db, bid_id)
         if not bid:
@@ -151,6 +143,28 @@ class BidService:
                 detail="Not authorized to view this bid"
             )
         
+        return bid
+
+    async def get_bid(
+        self, db: AsyncSession, *, bid_id: int, current_user: User
+    ) -> BidResponse:
+        """
+        Get bid by ID with access control.
+        
+        Args:
+            db: Database session
+            bid_id: Bid ID
+            current_user: Current authenticated user
+            
+        Returns:
+            BidResponse: Bid data
+            
+        Raises:
+            HTTPException: If bid not found or access denied
+        """
+        bid = await self.get_bid_with_details(
+            db, bid_id=bid_id, current_user=current_user
+        )
         return BidResponse.from_orm(bid)
     
     async def get_rfq_bids(
@@ -337,10 +351,13 @@ class BidService:
                 detail="Cannot select bid - RFQ is in invalid state"
             )
         
-        # Select the bid
-        selected_bid = await self.bid_repo.select_bid(db, bid_id=bid_id)
+        # Select the bid and award the RFQ in one transaction. select_bid()
+        # normally commits, so defer that commit until the RFQ update lands.
+        selected_bid = await self.bid_repo.select_bid(
+            db, bid_id=bid_id, commit=False
+        )
         
-        # Update RFQ status to AWARDED
+        # Update RFQ status to AWARDED (this commits both changes)
         await self.rfq_repo.update_status(
             db, rfq_id=bid.rfq_id, status=RFQStatus.AWARDED
         )
@@ -405,7 +422,7 @@ class BidService:
             )
         
         # Delete the bid
-        await self.bid_repo.delete(db, id=bid_id)
+        await self.bid_repo.delete(db, record_id=bid_id)
         
         return {"message": "Bid withdrawn successfully"}
 

@@ -240,10 +240,13 @@ async def generate_negotiation_message(
     Returns a professional negotiation message with context information.
     """
     from app.services.llm_service import llm_service
-    
-    # Get bid with full details
-    bid = await bid_service.get_bid(db, bid_id=bid_id, current_user=current_user)
-    
+
+    # Load the bid with its RFQ: BidResponse has no RFQ field, so the context
+    # below must come from the ORM object.
+    bid = await bid_service.get_bid_with_details(
+        db, bid_id=bid_id, current_user=current_user
+    )
+
     # Build context from bid and RFQ information
     context = f"""
     BID DETAILS:

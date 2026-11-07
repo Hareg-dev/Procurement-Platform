@@ -182,7 +182,8 @@ class BidRepository(BaseRepository[Bid, BidCreate, BidUpdate]):
         self, 
         db: AsyncSession, 
         *, 
-        bid_id: int
+        bid_id: int,
+        commit: bool = True
     ) -> Optional[Bid]:
         """
         Select a bid as the winning bid and unselect others for the same RFQ.
@@ -190,6 +191,8 @@ class BidRepository(BaseRepository[Bid, BidCreate, BidUpdate]):
         Args:
             db: Database session
             bid_id: Bid ID to select
+            commit: Commit immediately. Set to False to keep the change in the
+                caller's transaction (for example when awarding the RFQ too).
             
         Returns:
             Optional[Bid]: Selected bid if found, None otherwise
@@ -214,9 +217,12 @@ class BidRepository(BaseRepository[Bid, BidCreate, BidUpdate]):
         # Select the chosen bid
         selected_bid.is_selected = True
         db.add(selected_bid)
-        await db.commit()
-        await db.refresh(selected_bid)
-        
+        await db.flush()
+
+        if commit:
+            await db.commit()
+            await db.refresh(selected_bid)
+
         return selected_bid
     
     async def get_selected_bid(
