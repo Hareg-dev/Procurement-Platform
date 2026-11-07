@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from app.models.domain import UserCreate, UserUpdate
 from app.models.orm import User, Company
+from app.models.procurement import OrganizationMember, OrgRole
 from app.repositories.base import BaseRepository
 
 
@@ -79,7 +80,18 @@ class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
         user_data["company_id"] = db_company.id
         db_user = User(**user_data)
         db.add(db_user)
-        
+        await db.flush()
+
+        # The first user of a company is its organization admin. Additional
+        # members are added later through invitations.
+        db.add(
+            OrganizationMember(
+                organization_id=db_company.id,
+                user_id=db_user.id,
+                org_role=OrgRole.ORG_ADMIN,
+            )
+        )
+
         await db.commit()
         await db.refresh(db_user)
         await db.refresh(db_company)

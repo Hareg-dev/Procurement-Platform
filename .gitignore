@@ -164,8 +164,8 @@ cython_debug/
 .vscode/
 
 # Alembic
-alembic/versions/*.py
-!alembic/versions/
+# Migration scripts are part of the source and must be committed.
+alembic/versions/__pycache__/
 
 # Database
 *.db
