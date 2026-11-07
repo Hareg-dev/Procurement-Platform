@@ -38,6 +38,10 @@ class Settings(BaseSettings):
         default="/api/v1",
         description="API version 1 prefix",
     )
+    api_v2_str: str = Field(
+        default="/api/v2",
+        description="API version 2 prefix (source-to-pay domain)",
+    )
     project_name: str = Field(
         default="Procurement Platform",
         description="Project name for API documentation",

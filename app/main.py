@@ -1,10 +1,12 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.db import close_db, init_db
+from app.services.procurement.errors import DomainError
 
 
 @asynccontextmanager
@@ -46,7 +48,19 @@ def create_application() -> FastAPI:
 
     # Include API routes
     from app.api.v1.api import api_router
+    from app.api.v2.api import api_v2_router
+
     app.include_router(api_router, prefix=settings.api_v1_str)
+    app.include_router(api_v2_router, prefix=settings.api_v2_str)
+
+    @app.exception_handler(DomainError)
+    async def domain_error_handler(
+        request: Request, exc: DomainError
+    ) -> JSONResponse:
+        """Map domain errors (409/403/404/400) to a consistent JSON shape."""
+        return JSONResponse(
+            status_code=exc.status_code, content={"detail": str(exc)}
+        )
 
     @app.get("/")
     async def root():
