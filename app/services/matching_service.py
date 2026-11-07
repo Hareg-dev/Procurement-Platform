@@ -2,11 +2,12 @@
 AI-powered matching service for suppliers and RFQs
 """
 
+from datetime import datetime
 from typing import List, Dict, Any, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, func
+from sqlalchemy import select, and_, desc
 
-from app.models.orm import RFQ, Company, User, UserRole, RFQStatus
+from app.models.orm import RFQ, Bid, Company, User, UserRole, RFQStatus
 from app.services.llm_service import llm_service
 
 
@@ -32,7 +33,7 @@ class MatchingService:
             .where(and_(
                 RFQ.status == RFQStatus.OPEN,
                 RFQ.buyer_company_id != supplier_user.company_id,
-                RFQ.deadline > func.now()
+                RFQ.deadline > datetime.utcnow()
             ))
             .order_by(RFQ.created_at.desc())
             .limit(limit * 2)  # Get more to filter
@@ -105,20 +106,25 @@ class MatchingService:
     async def _get_supplier_profile(self, db: AsyncSession, user: User) -> Dict[str, Any]:
         """Extract supplier profile for matching"""
         company = user.company
-        
-        # Get recent bids to understand capabilities
-        recent_bids = await db.execute(
-            select(RFQ.title, RFQ.description)
-            .join(RFQ, RFQ.id == user.company.bids[0].rfq_id if user.company.bids else None)
+
+        # The RFQs this supplier has bid on describe the work it actually does.
+        # Query them directly instead of touching the lazy company.bids
+        # relationship, which cannot be loaded from async code.
+        result = await db.execute(
+            select(RFQ.title)
+            .join(Bid, Bid.rfq_id == RFQ.id)
+            .where(Bid.supplier_company_id == user.company_id)
+            .order_by(desc(Bid.created_at))
             .limit(5)
         )
-        
+        recent_projects = [title for (title,) in result.all()]
+
         return {
             "company_name": company.name,
             "description": company.description or "",
             "location": getattr(company, 'location', ''),
             "website": company.website or "",
-            "recent_projects": [bid.title for bid in recent_bids] if recent_bids else [],
+            "recent_projects": recent_projects,
             "industries": await self._extract_company_industries(company)
         }
 

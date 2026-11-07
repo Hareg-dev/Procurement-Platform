@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator
 
 from app.models.orm import UserRole, RFQStatus
 
@@ -57,6 +57,14 @@ class UserCreate(UserBase):
         ..., min_length=8, description="User password (min 8 characters)"
     )
     company: CompanyCreate = Field(..., description="Company information")
+
+    @field_validator("role")
+    @classmethod
+    def reject_admin_self_registration(cls, value: UserRole) -> UserRole:
+        """Admin accounts must be provisioned out of band, never via signup."""
+        if value == UserRole.ADMIN:
+            raise ValueError("Admin accounts cannot be self-registered")
+        return value
 
 
 class UserLogin(BaseModel):
@@ -170,6 +178,14 @@ class RFQBase(BaseModel):
     budget_max: Optional[float] = Field(None, ge=0, description="Maximum budget")
     requirements: Optional[str] = Field(None, description="Additional requirements")
 
+    @field_validator("deadline")
+    @classmethod
+    def normalize_deadline(cls, value: datetime) -> datetime:
+        """Store deadlines as naive UTC so comparisons against utcnow() are safe."""
+        if value.tzinfo is not None:
+            return value.astimezone(timezone.utc).replace(tzinfo=None)
+        return value
+
 
 class RFQCreate(RFQBase):
     """Schema for creating a new RFQ."""
@@ -187,6 +203,14 @@ class RFQUpdate(BaseModel):
     budget_max: Optional[float] = Field(None, ge=0)
     requirements: Optional[str] = None
     status: Optional[RFQStatus] = None
+
+    @field_validator("deadline")
+    @classmethod
+    def normalize_deadline(cls, value: Optional[datetime]) -> Optional[datetime]:
+        """Store deadlines as naive UTC so comparisons against utcnow() are safe."""
+        if value is not None and value.tzinfo is not None:
+            return value.astimezone(timezone.utc).replace(tzinfo=None)
+        return value
 
 
 class RFQResponse(RFQBase):

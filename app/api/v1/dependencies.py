@@ -11,6 +11,10 @@ from app.services.auth_service import auth_service
 # Security scheme for JWT token
 security = HTTPBearer()
 
+# Same scheme for endpoints where authentication is optional. auto_error=False
+# makes the dependency receive None instead of raising when the header is absent.
+optional_security = HTTPBearer(auto_error=False)
+
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -95,7 +99,7 @@ async def get_current_verified_user(
 
 
 async def get_optional_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security),
     db: AsyncSession = Depends(get_db)
 ) -> Optional[User]:
     """

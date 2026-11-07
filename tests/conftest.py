@@ -10,7 +10,7 @@ import pytest
 import pytest_asyncio
 from datetime import datetime, timedelta
 from typing import AsyncGenerator, Dict, Any
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -82,7 +82,9 @@ async def test_client(test_db_session: AsyncSession) -> AsyncGenerator[AsyncClie
     
     app.dependency_overrides[get_db] = override_get_db
     
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
         yield client
     
     app.dependency_overrides.clear()

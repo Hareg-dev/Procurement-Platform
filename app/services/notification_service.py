@@ -52,7 +52,7 @@ class NotificationService:
             .join(RFQ)
             .where(and_(
                 RFQ.buyer_company_id == user.company_id,
-                Bid.created_at >= datetime.now() - timedelta(days=7)
+                Bid.created_at >= datetime.utcnow() - timedelta(days=7)
             ))
             .order_by(desc(Bid.created_at))
             .limit(10)
@@ -75,19 +75,19 @@ class NotificationService:
             .where(and_(
                 RFQ.buyer_company_id == user.company_id,
                 RFQ.status == RFQStatus.OPEN,
-                RFQ.deadline <= datetime.now() + timedelta(days=3),
-                RFQ.deadline > datetime.now()
+                RFQ.deadline <= datetime.utcnow() + timedelta(days=3),
+                RFQ.deadline > datetime.utcnow()
             ))
         )
         
         for rfq in approaching_deadlines:
-            days_left = (rfq.deadline - datetime.now()).days
+            days_left = (rfq.deadline - datetime.utcnow()).days
             notifications.append(NotificationItem(
                 id=f"deadline_{rfq.id}",
                 title="Deadline Approaching",
                 message=f"'{rfq.title}' deadline in {days_left} day{'s' if days_left != 1 else ''}",
                 type="warning",
-                timestamp=datetime.now(),
+                timestamp=datetime.utcnow(),
                 read=False,
                 url=f"/rfqs/{rfq.id}"
             ))
@@ -110,7 +110,7 @@ class NotificationService:
             .join(RFQ)
             .where(and_(
                 Bid.supplier_company_id == user.company_id,
-                Bid.updated_at >= datetime.now() - timedelta(days=7)
+                Bid.updated_at >= datetime.utcnow() - timedelta(days=7)
             ))
             .order_by(desc(Bid.updated_at))
             .limit(5)
@@ -135,8 +135,8 @@ class NotificationService:
             .where(and_(
                 RFQ.status == RFQStatus.OPEN,
                 RFQ.buyer_company_id != user.company_id,
-                RFQ.created_at >= datetime.now() - timedelta(days=3),
-                RFQ.deadline > datetime.now()
+                RFQ.created_at >= datetime.utcnow() - timedelta(days=3),
+                RFQ.deadline > datetime.utcnow()
             ))
             .order_by(desc(RFQ.created_at))
             .limit(3)
@@ -170,7 +170,7 @@ class NotificationService:
             select(User, Company.name)
             .join(Company)
             .where(and_(
-                User.created_at >= datetime.now() - timedelta(days=7),
+                User.created_at >= datetime.utcnow() - timedelta(days=7),
                 User.is_verified == False
             ))
             .order_by(desc(User.created_at))
@@ -194,7 +194,7 @@ class NotificationService:
             .join(Company, RFQ.buyer_company_id == Company.id)
             .where(and_(
                 RFQ.budget_max >= 50000,
-                RFQ.created_at >= datetime.now() - timedelta(days=3)
+                RFQ.created_at >= datetime.utcnow() - timedelta(days=3)
             ))
             .order_by(desc(RFQ.created_at))
             .limit(3)
@@ -240,11 +240,11 @@ class NotificationService:
         """Create a new notification"""
         # TODO: Store in database
         return NotificationItem(
-            id=f"custom_{datetime.now().timestamp()}",
+            id=f"custom_{datetime.utcnow().timestamp()}",
             title=title,
             message=message,
             type=notification_type,
-            timestamp=datetime.now(),
+            timestamp=datetime.utcnow(),
             read=False,
             url=url
         )

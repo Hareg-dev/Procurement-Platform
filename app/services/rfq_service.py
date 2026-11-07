@@ -224,7 +224,9 @@ class RFQService:
         Raises:
             HTTPException: If RFQ not found, access denied, or invalid update
         """
-        rfq = await self.rfq_repo.get(db, rfq_id)
+        # Load bids too: the guard below reads rfq.bid_count, which would
+        # otherwise trigger an async lazy load (MissingGreenlet).
+        rfq = await self.rfq_repo.get_with_details(db, rfq_id)
         if not rfq:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

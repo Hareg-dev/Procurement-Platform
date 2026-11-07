@@ -61,6 +61,7 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         # Import all models here to ensure they are registered with Base
         from app.models.orm import User, Company, RFQ, Bid, Advertisement  # noqa: F401
+        from app.models.message import Message  # noqa: F401
 
         # Create all tables
         await conn.run_sync(Base.metadata.create_all)

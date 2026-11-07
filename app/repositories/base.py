@@ -81,7 +81,7 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         Returns:
             int: Number of records
         """
-        query = select(func.count())
+        query = select(func.count()).select_from(self.model)
         
         # Apply filters with validation
         allowed_fields = {c.name for c in self.model.__table__.columns}

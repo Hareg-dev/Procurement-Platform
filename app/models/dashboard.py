@@ -98,7 +98,7 @@ class AdminDashboard(BaseModel):
 
 class NotificationItem(BaseModel):
     """Notification item"""
-    id: int
+    id: str
     title: str
     message: str
     type: str  # "info", "warning", "success", "error"
