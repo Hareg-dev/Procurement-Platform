@@ -35,6 +35,15 @@ EXPECTED_TABLES = {
     "approval_steps",
     "audit_events",
     "outbox_events",
+    # v2 sourcing
+    "sourcing_events",
+    "sourcing_lots",
+    "sourcing_lines",
+    "sourcing_invitations",
+    "sourcing_questions",
+    "sourcing_addenda",
+    "sourcing_bids",
+    "sourcing_bid_lines",
 }
 
 
@@ -67,4 +76,4 @@ def test_upgrade_head_builds_and_is_idempotent():
 
     assert EXPECTED_TABLES <= tables
     assert "alembic_version" in tables
-    assert version == ("0003",)
+    assert version == ("0004",)
