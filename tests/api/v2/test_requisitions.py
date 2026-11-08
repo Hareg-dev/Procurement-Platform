@@ -157,7 +157,17 @@ class TestRequisitionCreation:
                 {"description": "Desk", "quantity": "1", "unit_price": "250"},
             ],
         }
-        data = await _create(test_client, team["requester"], body)
+        response = await test_client.post(
+            "/api/v2/requisitions",
+            json=body,
+            headers={
+                **auth_headers(team["requester"]),
+                "X-Request-ID": "test-correlation-123",
+            },
+        )
+        assert response.status_code == 201, response.text
+        assert response.headers["x-request-id"] == "test-correlation-123"
+        data = response.json()
 
         assert data["currency"] == "USD"
         assert Decimal(data["total_amount"]) == Decimal("451.00")
@@ -176,6 +186,7 @@ class TestRequisitionCreation:
             )
         ).scalars().first()
         assert audit is not None
+        assert audit.correlation_id == "test-correlation-123"
 
     async def test_membership_is_required(
         self, test_client: AsyncClient, test_buyer_user: User

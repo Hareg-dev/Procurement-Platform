@@ -6,6 +6,12 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.db import close_db, init_db
+from app.core.request_context import (
+    is_valid_request_id,
+    new_request_id,
+    reset_request_id,
+    set_request_id,
+)
 from app.services.procurement.errors import DomainError
 
 
@@ -36,6 +42,21 @@ def create_application() -> FastAPI:
         openapi_url=f"{settings.api_v1_str}/openapi.json",
         lifespan=lifespan,
     )
+
+    @app.middleware("http")
+    async def correlation_id_middleware(request: Request, call_next):
+        """Attach a trace id to the request and echo it to the client."""
+        supplied = request.headers.get("X-Request-ID", "")
+        request_id = (
+            supplied if is_valid_request_id(supplied) else new_request_id()
+        )
+        token = set_request_id(request_id)
+        try:
+            response = await call_next(request)
+        finally:
+            reset_request_id(token)
+        response.headers["X-Request-ID"] = request_id
+        return response
 
     # Set up CORS middleware
     app.add_middleware(

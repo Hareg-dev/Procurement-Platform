@@ -11,6 +11,7 @@ from typing import Any, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.request_context import get_request_id
 from app.models.orm import User
 from app.models.procurement import ActorType, AuditEvent, OutboxEvent
 
@@ -60,7 +61,7 @@ def record_audit(
         entity_id=entity_id,
         before=_jsonable(before) if before is not None else None,
         after=_jsonable(after) if after is not None else None,
-        correlation_id=correlation_id,
+        correlation_id=correlation_id or get_request_id(),
     )
     db.add(event)
     return event
