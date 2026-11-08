@@ -9,7 +9,8 @@ from alembic import context
 
 from app.core.config import settings
 from app.core.db import Base
-from app.models.orm import *  # Import all models
+# Import every model module so target_metadata is complete for autogenerate.
+from app.models import message, orm, procurement  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url)
