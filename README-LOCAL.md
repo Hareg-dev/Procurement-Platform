@@ -46,11 +46,17 @@ pip install -r requirements.txt
 copy .env.local .env
 ```
 
-### 4. Start the API
+### 4. Apply Migrations
+```bash
+alembic upgrade head
+```
+The schema is managed exclusively by Alembic. Running migrations is required
+before the first start and after pulling schema changes.
+
+### 5. Start the API
 ```bash
 uvicorn app.main:app --reload
 ```
-The schema is created automatically on startup by `app.core.db.init_db()`.
 
 ## Test the System
 

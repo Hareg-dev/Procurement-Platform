@@ -1,5 +1,6 @@
 from typing import AsyncGenerator
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.exc import SQLAlchemyError
@@ -53,19 +54,14 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 async def init_db() -> None:
     """
-    Initialize database by creating all tables.
+    Verify that the database is reachable.
 
-    This function should be called during application startup
-    to ensure all database tables are created.
+    The schema is owned by Alembic. Run ``alembic upgrade head`` before
+    starting the application; the Procfile, compose and container commands do
+    this automatically.
     """
-    async with engine.begin() as conn:
-        # Import all models here to ensure they are registered with Base
-        from app.models.orm import User, Company, RFQ, Bid, Advertisement  # noqa: F401
-        from app.models.message import Message  # noqa: F401
-        from app.models import procurement  # noqa: F401
-
-        # Create all tables
-        await conn.run_sync(Base.metadata.create_all)
+    async with engine.connect() as conn:
+        await conn.execute(text("SELECT 1"))
 
 
 async def close_db() -> None:

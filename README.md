@@ -126,13 +126,19 @@ curl -fsSL https://ollama.ai/install.sh | sh
 ollama pull tinyllama
 ```
 
-### 3. Start the Platform
+### 3. Prepare the Database
+```bash
+# Schema is managed by Alembic; the app no longer creates tables at startup
+alembic upgrade head
+```
+
+### 4. Start the Platform
 ```bash
 # Start the enhanced server
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 4. Access the System
+### 5. Access the System
 - **API Documentation**: http://localhost:8000/docs
 - **Health Check**: http://localhost:8000/health
 - **Interactive API**: http://localhost:8000/redoc
