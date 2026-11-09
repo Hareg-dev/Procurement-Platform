@@ -8,11 +8,11 @@ from app.core.db import get_db
 from app.models.orm import User
 from app.services.auth_service import auth_service
 
-# Security scheme for JWT token
-security = HTTPBearer()
+# Security scheme for JWT token. auto_error=False lets get_current_user raise a
+# consistent 401 for missing credentials instead of HTTPBearer's default 403.
+security = HTTPBearer(auto_error=False)
 
-# Same scheme for endpoints where authentication is optional. auto_error=False
-# makes the dependency receive None instead of raising when the header is absent.
+# Same scheme for endpoints where authentication is optional.
 optional_security = HTTPBearer(auto_error=False)
 
 
