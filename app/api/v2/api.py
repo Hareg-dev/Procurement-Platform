@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.v2.endpoints import (
+    agents,
     approvals,
     audit,
     budgets,
@@ -17,3 +18,4 @@ api_v2_router.include_router(budgets.router)
 api_v2_router.include_router(policies.router)
 api_v2_router.include_router(audit.router)
 api_v2_router.include_router(sourcing.router)
+api_v2_router.include_router(agents.router)
