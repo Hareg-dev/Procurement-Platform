@@ -44,6 +44,10 @@ EXPECTED_TABLES = {
     "sourcing_addenda",
     "sourcing_bids",
     "sourcing_bid_lines",
+    # agent runtime
+    "agent_runs",
+    "agent_steps",
+    "agent_proposals",
 }
 
 
@@ -76,4 +80,4 @@ def test_upgrade_head_builds_and_is_idempotent():
 
     assert EXPECTED_TABLES <= tables
     assert "alembic_version" in tables
-    assert version == ("0004",)
+    assert version == ("0005",)
