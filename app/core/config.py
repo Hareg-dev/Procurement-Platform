@@ -103,6 +103,38 @@ class Settings(BaseSettings):
         description="Celery result backend URL",
     )
 
+    # Agent runtime (AgentScope + Groq, OpenAI-compatible endpoint)
+    groq_api_key: str = Field(
+        default="",
+        description="Groq API key for the agent runtime. Empty disables agents.",
+    )
+    groq_base_url: str = Field(
+        default="https://api.groq.com/openai/v1",
+        description="OpenAI-compatible base URL for Groq",
+    )
+    groq_model: str = Field(
+        default="llama-3.3-70b-versatile",
+        description="Groq model used by the intake agent",
+    )
+    agent_max_iters: int = Field(
+        default=8,
+        ge=1,
+        le=30,
+        description="Maximum ReAct iterations per agent run",
+    )
+    agent_temperature: float = Field(
+        default=0.2,
+        ge=0,
+        le=2,
+        description="Sampling temperature for agent runs",
+    )
+    agent_max_tokens: int = Field(
+        default=2048,
+        ge=64,
+        le=8192,
+        description="Maximum completion tokens per agent model call",
+    )
+
     @property
     def is_development(self) -> bool:
         return self.environment.lower() == "development"

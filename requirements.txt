@@ -8,6 +8,7 @@ bcrypt==5.0.0
 python-multipart==0.0.20
 httpx==0.28.1
 ollama==0.6.1
+agentscope==2.0.11
 redis==7.1.0
 celery==5.5.3
 websockets==15.0.1
